@@ -2,3 +2,5 @@
 /Documentation/Vision.md
 /Documentation/UI.md
 /Documentation/PRD.md
+
+/canvaid/.env.local
