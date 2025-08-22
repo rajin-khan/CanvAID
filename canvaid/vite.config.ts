@@ -9,4 +9,15 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  // Add this server configuration block
+  server: {
+    proxy: {
+      // Proxy requests from /api to the Canvas API
+      '/api': {
+        target: 'https://northsouth.instructure.com',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 })

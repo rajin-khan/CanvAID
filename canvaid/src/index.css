@@ -95,3 +95,10 @@ body {
   filter: blur(100px);
   animation: aurora 30s ease-in-out infinite;
 }
+/* src/index.css - Add this at the bottom */
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
