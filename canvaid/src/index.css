@@ -7,16 +7,16 @@
   */
 
   /* Inky Dark Foundation */
-  --color-deepest-ink: #101014;   /* New main background, almost black */
-  --color-rich-slate: #18181B;    /* Secondary backgrounds, cards */
-  --color-moonstone: #27272A;     /* Elevated surfaces, inputs */
+  --color-deepest-ink: #101014;
+  --color-rich-slate: #18181B;
+  --color-moonstone: #27272A;
 
   /* Pastel Accent Palette */
-  --color-soft-lavender: #A78BFA; /* Primary Accent (violet-400) */
-  --color-gentle-peach: #FDBA74;  /* Secondary Accent (orange-300) */
-  --color-fresh-mint: #6EE7B7;   /* Success/Tertiary Accent (emerald-300) */
+  --color-soft-lavender: #A78BFA;
+  --color-gentle-peach: #FDBA74;
+  --color-fresh-mint: #6EE7B7;
 
-  /* Supporting Palette for Text, Borders, and Gradients */
+  /* Supporting Palette */
   --color-neutral-50: #fafafa;
   --color-neutral-100: #f5f5f5;
   --color-neutral-200: #e5e5e5;
@@ -63,6 +63,12 @@
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 /* Base Body Styles */
@@ -70,7 +76,7 @@ body {
   @apply font-family-sans bg-deepest-ink text-neutral-200 antialiased;
 }
 
-/* Custom aurora background effect for the main layout */
+/* Custom aurora background effect */
 .aurora-background {
   position: relative;
   isolation: isolate;
@@ -80,10 +86,7 @@ body {
 .aurora-background::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: 0; left: 0; right: 0; bottom: 0;
   z-index: -1;
   background-image: 
     radial-gradient(at 20% 20%, var(--color-violet-800) 0px, transparent 50%),
@@ -95,10 +98,18 @@ body {
   filter: blur(100px);
   animation: aurora 30s ease-in-out infinite;
 }
-/* src/index.css - Add this at the bottom */
 
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
+/* Custom utilities for flashcard 3D effect */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
 }
