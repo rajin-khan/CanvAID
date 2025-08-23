@@ -21,9 +21,8 @@ const Sidebar = () => {
       </div>
       <div className="flex-1 flex flex-col pt-6 px-4 space-y-2">
         <NavItem icon={Home} text="Dashboard" href="/" active={location.pathname === '/'} />
-        {/* The href="#" below is a placeholder. You would make these real links as you build out those pages. */}
         <NavItem icon={BookOpen} text="Courses" href="#" active={location.pathname.startsWith('/courses')} />
-        <NavItem icon={CheckSquare} text="Assignments" href="#" active={location.pathname.startsWith('/assignments')} />
+        <NavItem icon={CheckSquare} text="Assignments" href="/assignments" active={location.pathname.startsWith('/assignments')} />
         
         <div className="flex-grow" />
         
