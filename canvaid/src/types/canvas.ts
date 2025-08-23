@@ -1,6 +1,6 @@
 // src/types/canvas.ts
 
-// Based on the User object, simplified for our needs (e.g., instructor)
+// Based on the User object, simplified for our needs (e.g., instructor and self)
 export interface CanvasUser {
   id: number;
   name: string;
@@ -34,7 +34,6 @@ export interface CanvasCourse {
     next_requirement_url: string | null;
     completed_at: string | null;
   };
-  // We'll add a simplified instructor field for our UI
   instructor?: CanvasUser;
 }
 
@@ -53,6 +52,35 @@ export interface CanvasAssignment {
   position: number;
   published: boolean;
   html_url: string;
-  // We'll add a course_code for easy display in the UI
   course_code?: string;
+}
+
+// Based on the Module and ModuleItem objects
+export interface CanvasModuleItem {
+  id: number;
+  module_id: number;
+  position: number;
+  title: string;
+  indent: number;
+  type: 'File' | 'Page' | 'Discussion' | 'Assignment' | 'Quiz' | 'SubHeader' | 'ExternalUrl' | 'ExternalTool';
+  content_id?: number;
+  html_url: string;
+  page_url?: string;
+  external_url?: string;
+  new_tab?: boolean;
+  published: boolean;
+}
+
+export interface CanvasModule {
+  id: number;
+  workflow_state: 'active' | 'deleted';
+  position: number;
+  name: string;
+  unlock_at: string | null;
+  require_sequential_progress: boolean;
+  prerequisite_module_ids: number[];
+  items_count: number;
+  items_url: string;
+  items?: CanvasModuleItem[];
+  published: boolean;
 }

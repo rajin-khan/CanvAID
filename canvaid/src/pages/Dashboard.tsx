@@ -10,8 +10,8 @@ import { getCourses, getAssignments } from '../services/canvasAPI';
 import CourseCard from '../components/ui/CourseCard';
 import AssignmentCard from '../components/ui/AssignmentCard';
 import StatsCard from '../components/ui/StatsCard';
-import { DashboardSkeleton } from './DashboardSkeleton'; // We will create this
-import { ErrorDisplay } from '../components/ui/ErrorDisplay'; // We will create this
+import { DashboardSkeleton } from './DashboardSkeleton';
+import { ErrorDisplay } from '../components/ui/ErrorDisplay';
 import { BookCopy, CheckCircle, Clock } from 'lucide-react';
 
 const containerVariants: Variants = {
@@ -25,7 +25,7 @@ const itemVariants: Variants = {
 };
 
 const Dashboard = () => {
-  const { courses, assignments, setCourses, setAssignments } = useCourseStore();
+  const { user, courses, assignments, setCourses, setAssignments } = useCourseStore();
 
   const { data: coursesData, isLoading: coursesLoading, isError: coursesError } = useQuery({
     queryKey: ['courses'],
@@ -44,7 +44,9 @@ const Dashboard = () => {
   useEffect(() => {
     if (assignmentsData) setAssignments(assignmentsData);
   }, [assignmentsData, setAssignments]);
-
+  
+  const firstName = user?.name.split(' ')[0] || 'there';
+  
   const isLoading = coursesLoading || assignmentsLoading;
   const isError = coursesError || assignmentsError;
 
@@ -62,7 +64,7 @@ const Dashboard = () => {
     <div className="space-y-8 animate-fadeIn">
       <motion.div variants={itemVariants} initial="hidden" animate="visible">
         <h1 className="text-3xl font-bold tracking-tight text-neutral-50">
-          Hello, <span className="bg-linear-to-r from-soft-lavender to-gentle-peach bg-clip-text text-transparent">Emma</span>!
+          Hello, <span className="bg-linear-to-r from-soft-lavender to-gentle-peach bg-clip-text text-transparent">{firstName}</span>!
         </h1>
         <p className="text-neutral-300 mt-1">Ready to turn chaos into clarity? Let's get started.</p>
       </motion.div>
@@ -81,7 +83,7 @@ const Dashboard = () => {
           <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6" variants={containerVariants} initial="hidden" animate="visible" transition={{ delayChildren: 0.4, staggerChildren: 0.1 }}>
             {courses.map((course) => (
               <motion.div variants={itemVariants} key={course.id}>
-                <CourseCard title={course.name} instructor={course.instructor?.name ?? 'N/A'} progress={Math.floor(Math.random() * (85 - 45 + 1)) + 45} />
+                <CourseCard id={course.id} title={course.name} instructor={course.instructor?.name ?? 'N/A'} progress={Math.floor(Math.random() * (85 - 45 + 1)) + 45} />
               </motion.div>
             ))}
           </motion.div>

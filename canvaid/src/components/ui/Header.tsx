@@ -1,7 +1,10 @@
 // src/components/Header.tsx
 import { Search, Bell, UserCircle } from 'lucide-react';
+import useCourseStore from '../../store/courseStore';
 
 const Header = () => {
+  const { user } = useCourseStore();
+
   return (
     <header className="flex-shrink-0 bg-rich-slate/50 backdrop-blur-lg border-b border-moonstone/50">
       <div className="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8">
@@ -27,10 +30,23 @@ const Header = () => {
             <Bell className="h-6 w-6" />
           </button>
           <div className="flex items-center space-x-3">
-            <UserCircle className="h-9 w-9 text-neutral-400" />
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt="User avatar" className="h-9 w-9 rounded-full" />
+            ) : (
+              <UserCircle className="h-9 w-9 text-neutral-400" />
+            )}
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-neutral-100">Emma Johnson</p>
-              <p className="text-xs text-neutral-400">Psychology Major</p>
+              {user ? (
+                <>
+                  <p className="text-sm font-medium text-neutral-100">{user.name}</p>
+                  <p className="text-xs text-neutral-400">Student</p>
+                </>
+              ) : (
+                <div className="space-y-1">
+                  <div className="w-24 h-4 bg-moonstone rounded animate-pulse"></div>
+                  <div className="w-16 h-3 bg-moonstone rounded animate-pulse ml-auto"></div>
+                </div>
+              )}
             </div>
           </div>
         </div>
