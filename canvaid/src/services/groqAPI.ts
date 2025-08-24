@@ -78,3 +78,28 @@ export const generateFlashcards = async (courseName: string, courseContent: stri
         throw new Error("AI returned an invalid format for flashcards.");
     }
 };
+
+// NEW: Function to generate an action plan from an announcement
+export const generateActionPlan = async (announcementTitle: string, announcementMessage: string): Promise<string> => {
+    const client = getGroqClient();
+    const chatCompletion = await client.chat.completions.create({
+        messages: [
+            {
+                role: "system",
+                content: `You are a calm and helpful AI assistant named CanvAID. Your role is to help students create clear, actionable steps from university announcements. You will receive an announcement's title and content.
+- Analyze the announcement for key dates, tasks, requirements, or information.
+- Create a concise, step-by-step action plan in Markdown format.
+- Use checklists (- [ ]) for tasks.
+- Use bolding for emphasis on crucial items like deadlines or required readings.
+- If there are no clear actions, simply summarize the key takeaway.
+- Your tone should be encouraging and proactive. You are here to reduce stress, not add to it.`
+            },
+            {
+                role: "user",
+                content: `Here is an announcement titled "${announcementTitle}". Please create an action plan for me based on its content:\n\n${announcementMessage}`,
+            },
+        ],
+        model: "llama3-70b-8192",
+    });
+    return chatCompletion.choices[0]?.message?.content || "Sorry, I couldn't generate an action plan for this announcement.";
+};

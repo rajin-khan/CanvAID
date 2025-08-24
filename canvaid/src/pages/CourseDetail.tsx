@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import toast from 'react-hot-toast'; // <-- Import toast
+import toast from 'react-hot-toast'; // MODIFIED: Imported toast
 import { ChevronLeft, FileText, BookOpen, Sparkles, Loader, RefreshCcw } from 'lucide-react';
 
 import useCourseStore from '../store/courseStore';
@@ -48,8 +48,6 @@ const CourseDetail = () => {
   const [studyGuideContent, setStudyGuideContent] = useState<string | null>(null);
   const [flashcards, setFlashcards] = useState<FlashcardType[] | null>(null);
   
-  // We no longer need the aiError state, as toasts will handle it.
-
   useEffect(() => {
     if (courseId) {
       const cachedGuide = getCachedData<string>('guide', courseId);
@@ -97,7 +95,7 @@ const CourseDetail = () => {
       }
     } catch (error) {
       console.error(`Error generating ${type}:`, error);
-      toast.error(`Sorry, there was an issue generating the ${type}.`);
+      toast.error(`Sorry, there was an issue generating the ${type}.`); // MODIFIED: Uses toast now
     } finally {
       setIsGenerating(false);
       setGenerationType(null);

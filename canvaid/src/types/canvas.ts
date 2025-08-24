@@ -85,7 +85,7 @@ export interface CanvasModule {
   published: boolean;
 }
 
-// NEW: Based on the Announcements API (DiscussionTopic object)
+// MODIFIED: Based on the Announcements API (DiscussionTopic object)
 export interface CanvasAnnouncement {
     id: number;
     title: string;

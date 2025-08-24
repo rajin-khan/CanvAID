@@ -35,7 +35,10 @@ export const getCourses = (): Promise<CanvasCourse[]> => {
 
 export const getAssignments = async (): Promise<CanvasAssignment[]> => {
   console.log("Fetching REAL assignments from Canvas API...");
-  const courses = await getCourses();
+  // FIX: This now pulls from the apiClient which uses the store.
+  // It avoids an infinite loop of calling getCourses which calls getAssignments.
+  const courses = await apiClient<CanvasCourse[]>(COURSES_ENDPOINT);
+  
   if (!courses || courses.length === 0) return [];
 
   const assignmentPromises = courses.map(course => {
@@ -59,7 +62,7 @@ export const getAssignments = async (): Promise<CanvasAssignment[]> => {
   return allAssignments;
 };
 
-// NEW: Function to fetch announcements for a list of courses
+// NEW: Implemented function to fetch announcements for a list of courses
 export const getAnnouncements = async (courses: CanvasCourse[]): Promise<CanvasAnnouncement[]> => {
   console.log("Fetching REAL announcements from Canvas API...");
   if (!courses || courses.length === 0) {
@@ -70,6 +73,11 @@ export const getAnnouncements = async (courses: CanvasCourse[]): Promise<CanvasA
   const params = new URLSearchParams();
   contextCodes.forEach(code => params.append('context_codes[]', code));
   params.append('active_only', 'true');
+  // Optional: you can add a start_date to limit announcements to the last few weeks
+  // const twoWeeksAgo = new Date();
+  // twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+  // params.append('start_date', twoWeeksAgo.toISOString());
+
 
   const ANNOUNCEMENTS_ENDPOINT = `/api/v1/announcements?${params.toString()}`;
   return apiClient<CanvasAnnouncement[]>(ANNOUNCEMENTS_ENDPOINT);
