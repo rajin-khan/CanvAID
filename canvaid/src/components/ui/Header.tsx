@@ -3,7 +3,7 @@ import { Search, Bell, UserCircle } from 'lucide-react';
 import useCourseStore from '../../store/courseStore';
 
 const Header = () => {
-  const { user } = useCourseStore();
+  const { user, searchQuery, setSearchQuery } = useCourseStore();
 
   return (
     <header className="flex-shrink-0 bg-rich-slate/50 backdrop-blur-lg border-b border-moonstone/50">
@@ -15,7 +15,9 @@ const Header = () => {
           </div>
           <input
             type="text"
-            placeholder="Search everything..."
+            placeholder="Search courses..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             className="
               block w-full bg-moonstone/50 border border-neutral-700 rounded-lg
               pl-10 pr-4 py-2.5 text-neutral-100 placeholder:text-neutral-500

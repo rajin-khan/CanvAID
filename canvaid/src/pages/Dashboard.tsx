@@ -1,5 +1,5 @@
 // src/pages/Dashboard.tsx
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { motion, type Variants } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow } from 'date-fns';
@@ -25,7 +25,7 @@ const itemVariants: Variants = {
 };
 
 const Dashboard = () => {
-  const { user, courses, assignments, setCourses, setAssignments } = useCourseStore();
+  const { user, courses, assignments, searchQuery, setCourses, setAssignments } = useCourseStore();
 
   const { data: coursesData, isLoading: coursesLoading, isError: coursesError } = useQuery({
     queryKey: ['courses'],
@@ -47,6 +47,15 @@ const Dashboard = () => {
   
   const firstName = user?.name.split(' ')[0] || 'there';
   
+  // Filter courses based on the search query
+  const filteredCourses = useMemo(() => {
+    if (!searchQuery) return courses;
+    return courses.filter(course =>
+      course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.course_code.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [courses, searchQuery]);
+
   const isLoading = coursesLoading || assignmentsLoading;
   const isError = coursesError || assignmentsError;
 
@@ -81,12 +90,17 @@ const Dashboard = () => {
             Your Courses
           </motion.h2>
           <motion.div className="grid grid-cols-1 md:grid-cols-2 gap-6" variants={containerVariants} initial="hidden" animate="visible" transition={{ delayChildren: 0.4, staggerChildren: 0.1 }}>
-            {courses.map((course) => (
+            {filteredCourses.map((course) => (
               <motion.div variants={itemVariants} key={course.id}>
                 <CourseCard id={course.id} title={course.name} instructor={course.instructor?.name ?? 'N/A'} progress={Math.floor(Math.random() * (85 - 45 + 1)) + 45} />
               </motion.div>
             ))}
           </motion.div>
+          {filteredCourses.length === 0 && (
+            <div className="text-center py-10 bg-rich-slate/50 rounded-lg">
+              <p className="text-neutral-300">No courses match your search.</p>
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">
@@ -94,7 +108,7 @@ const Dashboard = () => {
             Up Next
           </motion.h2>
           <motion.div className="space-y-4" variants={containerVariants} initial="hidden" animate="visible" transition={{ delayChildren: 0.6, staggerChildren: 0.1 }}>
-            {assignments.map(assignment => (
+            {assignments.slice(0, 5).map(assignment => ( // Show top 5 assignments
               <motion.div variants={itemVariants} key={assignment.id}>
                 <AssignmentCard title={assignment.name} course={assignment.course_code ?? 'Course'} dueDate={assignment.due_at ? `Due ${formatDistanceToNow(new Date(assignment.due_at), { addSuffix: true })}` : 'No due date'} priority={assignment.points_possible > 75 ? 'high' : assignment.points_possible > 30 ? 'medium' : 'low'} />
               </motion.div>

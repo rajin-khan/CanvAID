@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import toast from 'react-hot-toast'; // <-- Import toast
 import { ChevronLeft, FileText, BookOpen, Sparkles, Loader, RefreshCcw } from 'lucide-react';
 
 import useCourseStore from '../store/courseStore';
@@ -46,7 +47,8 @@ const CourseDetail = () => {
   const [generationType, setGenerationType] = useState<'guide' | 'flashcards' | null>(null);
   const [studyGuideContent, setStudyGuideContent] = useState<string | null>(null);
   const [flashcards, setFlashcards] = useState<FlashcardType[] | null>(null);
-  const [aiError, setAiError] = useState<string | null>(null);
+  
+  // We no longer need the aiError state, as toasts will handle it.
 
   useEffect(() => {
     if (courseId) {
@@ -57,7 +59,7 @@ const CourseDetail = () => {
     }
   }, [courseId]);
 
-  const { data: modules, isLoading, isError } = useQuery({
+  const { data: modules, isLoading, isError: modulesError } = useQuery({
     queryKey: ['courseModules', courseId],
     queryFn: () => getCourseModules(courseId!),
     enabled: !!courseId,
@@ -68,7 +70,6 @@ const CourseDetail = () => {
 
     setIsGenerating(true);
     setGenerationType(type);
-    setAiError(null);
     if (forceRegenerate || type === 'guide') setStudyGuideContent(null);
     if (forceRegenerate || type === 'flashcards') setFlashcards(null);
 
@@ -77,7 +78,7 @@ const CourseDetail = () => {
       .map(module => `Module: ${module.name}\n` + (module.items?.map(item => `  - ${item.title} (Type: ${item.type})`).join('\n') || '')).join('\n\n');
     
     if (!courseContentText.trim()) {
-        setAiError("This course doesn't have any materials to generate a study aid from.");
+        toast.error("This course has no materials to generate from.");
         setIsGenerating(false);
         return;
     }
@@ -87,14 +88,16 @@ const CourseDetail = () => {
         const generatedContent = await generateStudyGuide(course.name, courseContentText);
         setStudyGuideContent(generatedContent);
         setCachedData('guide', courseId, generatedContent);
+        toast.success('Study guide generated!');
       } else if (type === 'flashcards') {
         const generatedFlashcards = await generateFlashcards(course.name, courseContentText);
         setFlashcards(generatedFlashcards);
         setCachedData('flashcards', courseId, generatedFlashcards);
+        toast.success('Flashcards are ready!');
       }
     } catch (error) {
       console.error(`Error generating ${type}:`, error);
-      setAiError(`Sorry, there was an issue generating the ${type}. Please try again.`);
+      toast.error(`Sorry, there was an issue generating the ${type}.`);
     } finally {
       setIsGenerating(false);
       setGenerationType(null);
@@ -102,11 +105,7 @@ const CourseDetail = () => {
   };
 
   if (isLoading && !course) {
-    return (
-        <div className="flex justify-center items-center h-64">
-            <Loader className="w-12 h-12 text-soft-lavender animate-spin" />
-        </div>
-    );
+    return <div className="flex justify-center items-center h-64"><Loader className="w-12 h-12 text-soft-lavender animate-spin" /></div>;
   }
   
   return (
@@ -144,29 +143,34 @@ const CourseDetail = () => {
       
       <div className="mt-8">
         {isGenerating && <AILoadingIndicator />}
-        {aiError && <ErrorDisplay message={aiError} />}
         {studyGuideContent && (
             <div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center mb-4">
                     <h3 className="text-2xl font-bold text-neutral-100">Study Guide</h3>
-                    <button onClick={() => handleGenerate('guide', true)} className="flex items-center text-sm text-neutral-400 hover:text-soft-lavender">
+                    <button onClick={() => handleGenerate('guide', true)} disabled={isGenerating} className="flex items-center text-sm text-neutral-400 hover:text-soft-lavender disabled:cursor-not-allowed disabled:text-neutral-600">
                         <RefreshCcw className="w-4 h-4 mr-2"/> Re-generate
                     </button>
                 </div>
                 <StudyGuideDisplay content={studyGuideContent} />
             </div>
         )}
-        {flashcards && flashcards.length > 0 && (
+        {flashcards && (
             <div className="mt-6">
-                 <div className="flex justify-between items-center">
+                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-2xl font-bold text-neutral-100">Key Concepts</h3>
-                    <button onClick={() => handleGenerate('flashcards', true)} className="flex items-center text-sm text-neutral-400 hover:text-soft-lavender">
+                    <button onClick={() => handleGenerate('flashcards', true)} disabled={isGenerating} className="flex items-center text-sm text-neutral-400 hover:text-soft-lavender disabled:cursor-not-allowed disabled:text-neutral-600">
                         <RefreshCcw className="w-4 h-4 mr-2"/> Re-generate
                     </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                    {flashcards.map((card, index) => <Flashcard key={index} card={card} />)}
-                </div>
+                {flashcards.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {flashcards.map((card, index) => <Flashcard key={index} card={card} />)}
+                  </div>
+                ) : (
+                  <div className="bg-rich-slate/70 border border-moonstone/50 rounded-xl p-8 text-center">
+                    <p className="text-neutral-300">The AI couldn't identify any key concepts to create flashcards from.</p>
+                  </div>
+                )}
             </div>
         )}
       </div>
@@ -174,7 +178,7 @@ const CourseDetail = () => {
       <div className="mt-8">
         <h2 className="text-xl font-medium text-neutral-100 mb-4">Course Modules & Materials</h2>
         {isLoading && <CourseDetailSkeleton />}
-        {isError && <ErrorDisplay message="Could not load course modules." />}
+        {modulesError && <ErrorDisplay message="Could not load course modules." />}
         {modules && modules.length === 0 && !isLoading && (
             <div className="bg-rich-slate/70 border border-moonstone/50 rounded-xl p-8 text-center">
                 <p className="text-neutral-300">This course doesn't seem to have any published modules yet.</p>
