@@ -3,14 +3,17 @@ import { Outlet, Navigate } from 'react-router-dom';
 import useCourseStore from '../store/courseStore';
 
 const ProtectedRoute = () => {
-  const { canvas, groq } = useCourseStore(state => state.apiKeys);
+  // THE FIX: Select each piece of state individually here as well for stability.
+  const canvasKey = useCourseStore(state => state.apiKeys.canvas);
+  const groqKey = useCourseStore(state => state.apiKeys.groq);
+  const institutionUrl = useCourseStore(state => state.institutionUrl);
 
-  // If both keys are present, the user is "logged in" and can access the app content
-  if (canvas && groq) {
+  // If all credentials are present, the user is "logged in"
+  if (canvasKey && groqKey && institutionUrl) {
     return <Outlet />;
   }
   
-  // If keys are missing, redirect to the settings page so the user can add them
+  // If anything is missing, redirect to the settings page
   return <Navigate to="/settings" replace />;
 };
 

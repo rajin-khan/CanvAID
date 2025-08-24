@@ -1,15 +1,13 @@
 // src/services/canvasAPI.ts
 import apiClient from './apiClient';
-import { type CanvasCourse, type CanvasAssignment, type CanvasUser } from '../types/canvas';
+import { type CanvasCourse, type CanvasAssignment, type CanvasUser, type CanvasAnnouncement } from '../types/canvas';
 
 // API Endpoints based on the documentation
 const COURSES_ENDPOINT = '/api/v1/courses?enrollment_state=active&include[]=teachers&include[]=total_students';
-const SELF_ENDPOINT = '/api/v1/users/self/profile'; // <-- New endpoint for the current user
+const SELF_ENDPOINT = '/api/v1/users/self/profile';
 
-// New function to fetch the current user's profile
 export const getSelf = (): Promise<CanvasUser> => {
   console.log("Fetching REAL user profile from Canvas API...");
-  // The User Profile API returns a slightly different shape, so we map it to our CanvasUser type
   return apiClient<any>(SELF_ENDPOINT).then(profile => ({
     id: profile.id,
     name: profile.name,
@@ -19,7 +17,6 @@ export const getSelf = (): Promise<CanvasUser> => {
   }));
 };
 
-// This function fetches all active courses
 export const getCourses = (): Promise<CanvasCourse[]> => {
   console.log("Fetching REAL courses from Canvas API...");
   return apiClient<any[]>(COURSES_ENDPOINT).then(courses =>
@@ -36,11 +33,10 @@ export const getCourses = (): Promise<CanvasCourse[]> => {
   );
 };
 
-// This function fetches assignments for ALL provided courses concurrently
 export const getAssignments = async (): Promise<CanvasAssignment[]> => {
   console.log("Fetching REAL assignments from Canvas API...");
-
   const courses = await getCourses();
+  if (!courses || courses.length === 0) return [];
 
   const assignmentPromises = courses.map(course => {
     const endpoint = `/api/v1/courses/${course.id}/assignments?bucket=upcoming`;
@@ -53,7 +49,6 @@ export const getAssignments = async (): Promise<CanvasAssignment[]> => {
   });
 
   const assignmentsByCourse = await Promise.all(assignmentPromises);
-
   const allAssignments = assignmentsByCourse.flat().sort((a, b) => {
     if (!a.due_at) return 1;
     if (!b.due_at) return -1;
@@ -62,4 +57,20 @@ export const getAssignments = async (): Promise<CanvasAssignment[]> => {
 
   console.log('All assignments fetched and combined:', allAssignments);
   return allAssignments;
+};
+
+// NEW: Function to fetch announcements for a list of courses
+export const getAnnouncements = async (courses: CanvasCourse[]): Promise<CanvasAnnouncement[]> => {
+  console.log("Fetching REAL announcements from Canvas API...");
+  if (!courses || courses.length === 0) {
+    return [];
+  }
+  
+  const contextCodes = courses.map(course => `course_${course.id}`);
+  const params = new URLSearchParams();
+  contextCodes.forEach(code => params.append('context_codes[]', code));
+  params.append('active_only', 'true');
+
+  const ANNOUNCEMENTS_ENDPOINT = `/api/v1/announcements?${params.toString()}`;
+  return apiClient<CanvasAnnouncement[]>(ANNOUNCEMENTS_ENDPOINT);
 };

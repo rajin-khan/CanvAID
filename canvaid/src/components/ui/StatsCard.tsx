@@ -1,4 +1,4 @@
-// src/components/StatsCard.tsx
+// src/components/ui/StatsCard.tsx
 import React from 'react';
 import { motion } from 'framer-motion';
 
@@ -37,7 +37,8 @@ const StatsCard = ({ title, value, icon: Icon, trend, color }: StatsCardProps) =
         <Icon className={`w-6 h-6 ${colorClasses[color]}`} />
       </div>
       <div className="mt-2">
-        <p className="text-3xl font-semibold text-neutral-50">{value}</p>
+        {/* RESPONSIVE FIX: Added break-words to handle wrapping */}
+        <p className="text-3xl font-semibold text-neutral-50 break-words">{value}</p>
         <p className="text-xs text-neutral-400 mt-1">{trend}</p>
       </div>
     </motion.div>

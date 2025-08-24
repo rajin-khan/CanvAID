@@ -84,3 +84,13 @@ export interface CanvasModule {
   items?: CanvasModuleItem[];
   published: boolean;
 }
+
+// NEW: Based on the Announcements API (DiscussionTopic object)
+export interface CanvasAnnouncement {
+    id: number;
+    title: string;
+    message: string; // This is an HTML string
+    html_url: string;
+    posted_at: string;
+    context_code: string; // e.g., "course_123"
+}
