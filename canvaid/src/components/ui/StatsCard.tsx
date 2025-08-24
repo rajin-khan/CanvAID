@@ -1,5 +1,6 @@
 // src/components/StatsCard.tsx
 import React from 'react';
+import { motion } from 'framer-motion';
 
 interface StatsCardProps {
   title: string;
@@ -23,10 +24,14 @@ const bgClasses = {
 
 const StatsCard = ({ title, value, icon: Icon, trend, color }: StatsCardProps) => {
   return (
-    <div className={`
-      ${bgClasses[color]} border border-moonstone/50 rounded-2xl p-5
-      shadow-lg shadow-black/20
-    `}>
+    <motion.div
+      whileHover={{ scale: 1.05, y: -5 }}
+      transition={{ type: 'spring', stiffness: 300 }}
+      className={`
+        ${bgClasses[color]} border border-moonstone/50 rounded-2xl p-5
+        shadow-lg shadow-black/20
+      `}
+    >
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-neutral-300">{title}</p>
         <Icon className={`w-6 h-6 ${colorClasses[color]}`} />
@@ -35,7 +40,7 @@ const StatsCard = ({ title, value, icon: Icon, trend, color }: StatsCardProps) =
         <p className="text-3xl font-semibold text-neutral-50">{value}</p>
         <p className="text-xs text-neutral-400 mt-1">{trend}</p>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

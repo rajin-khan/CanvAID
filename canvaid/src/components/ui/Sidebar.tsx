@@ -29,7 +29,8 @@ const Sidebar = () => {
   const isLoggedIn = !!canvas && !!groq;
 
   return (
-    <div className="hidden md:flex flex-col w-64 bg-rich-slate/50 backdrop-blur-lg border-r border-moonstone/50">
+    // <-- PERFORMANCE: Removed backdrop-blur, using solid but semi-transparent bg
+    <div className="hidden md:flex flex-col w-64 bg-rich-slate/80 border-r border-moonstone/50">
       <div className="flex items-center justify-center h-20 border-b border-moonstone/50">
         <Link to="/" className="text-2xl font-bold tracking-tighter bg-linear-to-r from-soft-lavender to-gentle-peach bg-clip-text text-transparent">
           CanvAID

@@ -1,37 +1,51 @@
 // src/pages/WelcomePage.tsx
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion'; // <-- Import Variants type
 import { KeyRound, BookLock } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
+// Apply the Variants type to our constants
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.2, delayChildren: 0.3 },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
+};
 
 const WelcomePage = () => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="flex flex-col items-center justify-center text-center h-full"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="flex flex-col items-center justify-center text-center h-full max-w-2xl mx-auto"
     >
-      <div className="p-8 bg-rich-slate/50 backdrop-blur-lg border border-moonstone/50 rounded-2xl shadow-2xl shadow-black/30 max-w-lg">
-        <div className="mx-auto mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-linear-to-br from-violet-500 to-pink-500">
-          <BookLock className="h-8 w-8 text-white" />
-        </div>
-        <h1 className="text-3xl font-bold tracking-tighter text-neutral-50 mb-2">
-          Welcome to <span className="bg-linear-to-r from-soft-lavender to-gentle-peach bg-clip-text text-transparent">CanvAID</span>
-        </h1>
-        <p className="text-neutral-300 mb-8">
-          To get started, you'll need to add your API keys. This allows CanvAID to access your course materials and use AI to create study aids, all within your browser.
-        </p>
+      <motion.div variants={itemVariants} className="mb-6 h-16 w-16 flex items-center justify-center rounded-full bg-linear-to-br from-violet-500 to-pink-500">
+        <BookLock className="h-8 w-8 text-white" />
+      </motion.div>
+
+      <motion.h1 variants={itemVariants} className="text-5xl md:text-6xl font-extrabold tracking-tighter text-neutral-50 mb-4">
+        Turn Chaos into <span className="bg-linear-to-r from-soft-lavender to-gentle-peach bg-clip-text text-transparent">Clarity</span>.
+      </motion.h1>
+      
+      <motion.p variants={itemVariants} className="text-lg text-neutral-300 mb-8 max-w-xl">
+        CanvAID is your personal AI study partner. It transforms scattered Canvas materials into organized, actionable study aids, helping you learn smarter, not harder.
+      </motion.p>
+      
+      <motion.div variants={itemVariants}>
         <Link
           to="/settings"
-          className="inline-flex items-center justify-center w-full px-5 py-3 font-semibold text-white rounded-lg transition-all duration-300 bg-linear-to-r from-violet-500 to-pink-500 hover:shadow-lg hover:shadow-violet-500/30 hover:translate-y-[-2px] focus:ring-4 focus:ring-violet-500/40"
+          className="inline-flex items-center justify-center w-full sm:w-auto px-8 py-4 font-semibold text-white rounded-full transition-all duration-300 bg-linear-to-r from-violet-500 to-pink-500 hover:shadow-2xl hover:shadow-violet-500/30 hover:scale-105 focus:ring-4 focus:ring-violet-500/40"
         >
-          <KeyRound className="w-5 h-5 mr-2" />
-          Go to Settings
+          <KeyRound className="w-5 h-5 mr-3" />
+          Get Started with Your API Keys
         </Link>
-        <p className="text-xs text-neutral-500 mt-6">
-          Your keys are stored securely in your browser and are never shared.
-        </p>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };

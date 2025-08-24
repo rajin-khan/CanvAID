@@ -6,7 +6,8 @@ const Header = () => {
   const { user, searchQuery, setSearchQuery } = useCourseStore();
 
   return (
-    <header className="flex-shrink-0 bg-rich-slate/50 backdrop-blur-lg border-b border-moonstone/50">
+    // <-- PERFORMANCE: Removed backdrop-blur, using solid but semi-transparent bg
+    <header className="flex-shrink-0 bg-rich-slate/80 border-b border-moonstone/50">
       <div className="flex items-center justify-between h-20 px-4 sm:px-6 lg:px-8">
         {/* Search Bar */}
         <div className="relative w-full max-w-xs">

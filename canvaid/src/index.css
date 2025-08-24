@@ -3,7 +3,7 @@
 
 @theme {
   /* 
-    CanvAID UI Design System v2: Cute, Dark, Pastel & Gradients
+    CanvAID UI Design System v3: Performant, Polished, & Fast
   */
 
   /* Inky Dark Foundation */
@@ -46,29 +46,10 @@
   /* Animations & Keyframes */
   --animation-fadeIn: fadeIn 0.5s ease-in-out;
   --animation-slideUp: slideUp 0.5s ease-in-out;
-  --animation-aurora: aurora 20s linear infinite;
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
   
-  @keyframes aurora {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  @keyframes shimmer {
-    100% {
-      transform: translateX(100%);
-    }
-  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes shimmer { 100% { transform: translateX(100%); } }
 }
 
 /* Base Body Styles */
@@ -76,40 +57,29 @@ body {
   @apply font-family-sans bg-deepest-ink text-neutral-200 antialiased;
 }
 
-/* Custom aurora background effect */
+/* --- PERFORMANCE OVERHAUL: Static Gradient Background --- */
+/* Replaced animated aurora with a beautiful, performant static nebula gradient */
 .aurora-background {
   position: relative;
   isolation: isolate;
   overflow: hidden;
 }
-
 .aurora-background::before {
   content: "";
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
   z-index: -1;
   background-image: 
-    radial-gradient(at 20% 20%, var(--color-violet-800) 0px, transparent 50%),
-    radial-gradient(at 80% 20%, var(--color-blue-500) 0px, transparent 50%),
-    radial-gradient(at 20% 80%, var(--color-pink-500) 0px, transparent 50%),
-    radial-gradient(at 80% 80%, var(--color-orange-400) 0px, transparent 50%);
-  background-size: 300% 300%;
-  opacity: 0.15;
-  filter: blur(100px);
-  animation: aurora 30s ease-in-out infinite;
+    radial-gradient(ellipse at 70% 20%, var(--color-violet-800) 0px, transparent 40%),
+    radial-gradient(ellipse at 30% 80%, var(--color-pink-500) 0px, transparent 40%),
+    radial-gradient(ellipse at 90% 90%, var(--color-orange-400) 0px, transparent 50%);
+  opacity: 0.2;
+  filter: blur(120px);
 }
 
+
 /* Custom utilities for flashcard 3D effect */
-.perspective-1000 {
-  perspective: 1000px;
-}
-.preserve-3d {
-  transform-style: preserve-3d;
-}
-.backface-hidden {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-.rotate-y-180 {
-  transform: rotateY(180deg);
-}
+.perspective-1000 { perspective: 1000px; }
+.preserve-3d { transform-style: preserve-3d; }
+.backface-hidden { backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.rotate-y-180 { transform: rotateY(180deg); }
