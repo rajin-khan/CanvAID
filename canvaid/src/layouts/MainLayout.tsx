@@ -2,37 +2,42 @@
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Toaster } from 'react-hot-toast'; // <-- Import Toaster
+import { Toaster } from 'react-hot-toast';
 import Sidebar from '../components/ui/Sidebar';
 import Header from '../components/ui/Header';
 import useCourseStore from '../store/courseStore';
 import { getSelf } from '../services/canvasAPI';
 
 const MainLayout = () => {
-  const { setUser } = useCourseStore();
+  const { setUser, apiKeys } = useCourseStore();
 
-  const { data: userData } = useQuery({
+  const { data: userData, isError } = useQuery({
     queryKey: ['self'],
     queryFn: getSelf,
-    staleTime: 1000 * 60 * 5,
+    enabled: !!apiKeys.canvas, // Only fetch user data if the canvas key exists
+    staleTime: Infinity, // User data rarely changes, cache it indefinitely
+    retry: 1, // Don't retry endlessly on auth errors
   });
 
   useEffect(() => {
     if (userData) {
       setUser(userData);
     }
-  }, [userData, setUser]);
+    if(isError) {
+      // The apiClient will have already logged the user out on a 401
+      console.error("Failed to fetch user profile, likely due to invalid key.");
+    }
+  }, [userData, setUser, isError]);
 
   return (
     <div className="flex h-screen bg-deepest-ink text-neutral-200 aurora-background">
-      {/* --- Add Toaster component here --- */}
       <Toaster 
         position="bottom-right"
         toastOptions={{
           style: {
-            background: '#27272A', // moonstone
-            color: '#fafafa', // neutral-50
-            border: '1px solid #404040', // neutral-700
+            background: '#27272A',
+            color: '#fafafa',
+            border: '1px solid #404040',
           },
         }}
       />
