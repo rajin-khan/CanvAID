@@ -6,8 +6,8 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ) {
-  // FIX: The complete path and query string from the original request
-  // is now correctly extracted from the `path` query parameter.
+  // The complete path and query string from the original request
+  // is correctly extracted from the `path` query parameter.
   const canvasPathAndQuery = req.query.path;
 
   const canvasHost = req.headers['x-canvas-host'];
@@ -21,8 +21,10 @@ export default async function handler(
     return res.status(401).json({ error: "Proxy error: Missing Authorization header." });
   }
   
-  // The full target URL to the Canvas API.
-  const targetUrl = `${canvasHost}/api/v1/${canvasPathAndQuery}`;
+  // THE FIX: The hardcoded '/api/v1/' has been removed.
+  // The 'canvasPathAndQuery' variable already contains the full path (e.g., 'api/v1/courses').
+  // This now constructs the correct URL like: https://[your-host]/api/v1/courses
+  const targetUrl = `${canvasHost}/${canvasPathAndQuery}`;
 
   try {
     // Make the actual request from the serverless function to the Canvas API.
