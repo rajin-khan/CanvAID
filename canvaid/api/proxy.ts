@@ -5,20 +5,21 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ) {
-  const canvasPathAndQuery = req.query.path;
+  // --- MODIFIED: Read from server-side environment variable ---
+  const canvasHost = process.env.CANVAS_BASE_URL;
+  // --- END MODIFICATION ---
 
-  const canvasHost = req.headers['x-canvas-host'];
+  const canvasPathAndQuery = req.query.path;
   const authorization = req.headers['authorization'];
 
   if (!canvasHost) {
-    return res.status(400).json({ error: "Proxy error: Missing X-Canvas-Host header." });
+    return res.status(500).json({ error: "Proxy error: CANVAS_BASE_URL is not configured on the server." });
   }
 
   if (!authorization) {
     return res.status(401).json({ error: "Proxy error: Missing Authorization header." });
   }
   
-  // This correctly constructs the URL using the 'path' query param.
   const targetUrl = `${canvasHost}/${canvasPathAndQuery}`;
 
   try {

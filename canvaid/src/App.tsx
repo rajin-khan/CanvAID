@@ -10,13 +10,12 @@ import WelcomePage from './pages/WelcomePage';
 import useCourseStore from './store/courseStore';
 
 function App() {
-  // THE FIX: Select each piece of state individually to prevent infinite loops.
-  // This avoids creating a new object on every render.
   const canvasKey = useCourseStore(state => state.apiKeys.canvas);
   const groqKey = useCourseStore(state => state.apiKeys.groq);
-  const institutionUrl = useCourseStore(state => state.institutionUrl);
+  // --- REMOVED: institutionUrl ---
 
-  const hasCredentials = !!canvasKey && !!groqKey && !!institutionUrl;
+  // --- MODIFIED: Simplified credentials check ---
+  const hasCredentials = !!canvasKey && !!groqKey;
 
   return (
     <Routes>
@@ -24,7 +23,6 @@ function App() {
         <Route index element={hasCredentials ? <Dashboard /> : <WelcomePage />} />
         <Route path="/settings" element={<SettingsPage />} />
         
-        {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="courses/:courseId" element={<CourseDetail />} />
           <Route path="assignments" element={<AssignmentsPage />} />

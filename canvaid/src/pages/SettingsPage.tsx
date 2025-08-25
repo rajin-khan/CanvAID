@@ -4,45 +4,27 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import useCourseStore from '../store/courseStore';
 import { KeyRound, LogOut, Save, University } from 'lucide-react';
-import { supportedInstitutions } from '../config/institutions';
+// --- REMOVED: supportedInstitutions import ---
 
 const SettingsPage = () => {
-  const { apiKeys, institutionUrl, saveCredentials, logout } = useCourseStore();
+  const { apiKeys, saveCredentials, logout } = useCourseStore();
 
   const [canvasKey, setCanvasKey] = useState(apiKeys.canvas || '');
   const [groqKey, setGroqKey] = useState(apiKeys.groq || '');
-  const [selectedInstitution, setSelectedInstitution] = useState(institutionUrl || '');
-  const [customUrl, setCustomUrl] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(!!apiKeys.canvas && !!apiKeys.groq && !!institutionUrl);
+  // --- REMOVED: institution state variables ---
+  
+  const [isLoggedIn, setIsLoggedIn] = useState(!!apiKeys.canvas && !!apiKeys.groq);
 
-  useEffect(() => {
-    // If a URL is already saved, pre-fill the form correctly
-    const isCustom = supportedInstitutions.every(inst => inst.url !== institutionUrl) && institutionUrl;
-    if (isCustom) {
-      setSelectedInstitution('other');
-      setCustomUrl(institutionUrl);
-    } else {
-      setSelectedInstitution(institutionUrl || '');
-    }
-  }, [institutionUrl]);
+  // --- REMOVED: useEffect for setting institution state ---
 
   const handleSave = () => {
-    const finalUrl = selectedInstitution === 'other' ? customUrl.trim() : selectedInstitution;
-
-    if (!canvasKey.trim() || !groqKey.trim() || !finalUrl) {
-      toast.error("Institution URL and both API keys are required.");
+    // --- MODIFIED: Simplified save logic ---
+    if (!canvasKey.trim() || !groqKey.trim()) {
+      toast.error("Both API keys are required.");
       return;
     }
 
-    // A simple check to ensure it's a valid-looking URL
-    try {
-      new URL(finalUrl);
-    } catch (error) {
-      toast.error("Please enter a valid Institution URL.");
-      return;
-    }
-
-    saveCredentials({ canvas: canvasKey, groq: groqKey, institutionUrl: finalUrl });
+    saveCredentials({ canvas: canvasKey, groq: groqKey });
     setIsLoggedIn(true);
     toast.success("Settings saved successfully! You can now navigate to the dashboard.", {
       duration: 4000
@@ -51,7 +33,6 @@ const SettingsPage = () => {
 
   const handleLogout = () => {
     logout();
-    // The logout function now forces a reload, which will re-render this page in a logged-out state
   };
 
   return (
@@ -62,7 +43,7 @@ const SettingsPage = () => {
     >
       <div>
         <h1 className="text-3xl font-bold tracking-tight text-neutral-50">Settings</h1>
-        <p className="text-neutral-300 mt-1">Manage your institution and API keys to connect CanvAID.</p>
+        <p className="text-neutral-300 mt-1">Manage your API keys to connect CanvAID.</p>
       </div>
 
       <div className="bg-rich-slate/50 border border-moonstone/50 rounded-xl p-6">
@@ -71,42 +52,22 @@ const SettingsPage = () => {
           Connection Details
         </h2>
         <p className="text-sm text-neutral-400 mt-2">
-          Your keys and institution URL are stored securely in your browser's local storage and are never sent to our servers.
+          Your keys are stored securely in your browser's local storage and are never sent to our servers.
         </p>
         
         <div className="space-y-6 mt-6">
+          {/* --- MODIFIED: Replaced dropdown with static text --- */}
           <div>
-            <label htmlFor="institution" className="block text-sm font-medium text-neutral-200 mb-1">
+            <label className="block text-sm font-medium text-neutral-200 mb-1">
               <University className="inline w-4 h-4 mr-2" />
-              Your Institution
+              Connected Institution
             </label>
-            <select
-              id="institution"
-              value={selectedInstitution}
-              onChange={(e) => setSelectedInstitution(e.target.value)}
-              className="block w-full bg-moonstone/50 border border-neutral-700 rounded-lg px-4 py-2.5 text-neutral-100 focus:ring-2 focus:ring-soft-lavender/50 focus:border-soft-lavender"
-            >
-              <option value="" disabled>Select your institution</option>
-              {supportedInstitutions.map((inst) => (
-                <option key={inst.url} value={inst.url}>{inst.name}</option>
-              ))}
-              <option value="other">Other...</option>
-            </select>
-            {selectedInstitution === 'other' && (
-              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-2">
-                 <label htmlFor="custom-url" className="block text-sm font-medium text-neutral-200 mt-4">Custom Canvas URL</label>
-                <input
-                  type="url"
-                  id="custom-url"
-                  placeholder="https://canvas.myuniversity.edu"
-                  value={customUrl}
-                  onChange={(e) => setCustomUrl(e.target.value)}
-                  className="mt-1 block w-full bg-moonstone/80 border border-neutral-600 rounded-lg px-4 py-2.5 text-neutral-100 focus:ring-2 focus:ring-soft-lavender/50 focus:border-soft-lavender"
-                />
-                <p className="text-xs text-neutral-500 mt-1">Enter the full URL to your Canvas instance.</p>
-              </motion.div>
-            )}
+            <div className="block w-full bg-moonstone/50 border border-neutral-700 rounded-lg px-4 py-2.5 text-neutral-100">
+              North South University
+            </div>
+             <p className="text-xs text-neutral-500 mt-1">This application is configured for a specific institution.</p>
           </div>
+          {/* --- END MODIFICATION --- */}
 
           <div>
             <label htmlFor="canvas-key" className="block text-sm font-medium text-neutral-200">Canvas API Key</label>
@@ -153,7 +114,7 @@ const SettingsPage = () => {
         <div className="bg-rich-slate/50 border border-moonstone/50 rounded-xl p-6 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-semibold text-neutral-100">Log Out</h2>
-            <p className="text-sm text-neutral-400 mt-1">This will clear your API keys and institution URL from this browser.</p>
+            <p className="text-sm text-neutral-400 mt-1">This will clear your API keys from this browser.</p>
           </div>
           <button 
             onClick={handleLogout}

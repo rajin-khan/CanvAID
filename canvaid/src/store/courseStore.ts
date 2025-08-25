@@ -7,23 +7,22 @@ interface ApiKeys {
   groq: string | null;
 }
 
-interface Credentials extends ApiKeys {
-  institutionUrl: string | null;
-}
+// --- MODIFIED: Credentials no longer includes institutionUrl ---
+interface Credentials extends ApiKeys {}
 
 interface CourseState {
   user: CanvasUser | null;
   courses: CanvasCourse[];
   assignments: CanvasAssignment[];
-  announcements: CanvasAnnouncement[]; // Add announcements
+  announcements: CanvasAnnouncement[];
   searchQuery: string;
   apiKeys: ApiKeys;
-  institutionUrl: string | null;
+  // --- REMOVED: institutionUrl ---
   
   setUser: (user: CanvasUser) => void;
   setCourses: (courses: CanvasCourse[]) => void;
   setAssignments: (assignments: CanvasAssignment[]) => void;
-  setAnnouncements: (announcements: CanvasAnnouncement[]) => void; // Add setter
+  setAnnouncements: (announcements: CanvasAnnouncement[]) => void;
   setSearchQuery: (query: string) => void;
   saveCredentials: (credentials: Credentials) => void;
   logout: () => void;
@@ -33,34 +32,34 @@ const useCourseStore = create<CourseState>((set) => ({
   user: null,
   courses: [],
   assignments: [],
-  announcements: [], // Default to empty array
+  announcements: [],
   searchQuery: '',
   apiKeys: {
     canvas: localStorage.getItem('canvaid_canvas_api_key'),
     groq: localStorage.getItem('canvaid_groq_api_key'),
   },
-  institutionUrl: localStorage.getItem('canvaid_institution_url'),
+  // --- REMOVED: institutionUrl initialization ---
   setUser: (user) => set({ user }),
   setCourses: (courses) => set({ courses }),
   setAssignments: (assignments) => set({ assignments }),
-  setAnnouncements: (announcements) => set({ announcements }), // Implement setter
+  setAnnouncements: (announcements) => set({ announcements }),
   setSearchQuery: (query) => set({ searchQuery: query }),
   saveCredentials: (credentials) => {
     if (credentials.canvas) localStorage.setItem('canvaid_canvas_api_key', credentials.canvas);
     if (credentials.groq) localStorage.setItem('canvaid_groq_api_key', credentials.groq);
-    if (credentials.institutionUrl) localStorage.setItem('canvaid_institution_url', credentials.institutionUrl);
+    // --- REMOVED: institutionUrl saving ---
     set({ 
       apiKeys: { canvas: credentials.canvas, groq: credentials.groq },
-      institutionUrl: credentials.institutionUrl 
     });
   },
   logout: () => {
     localStorage.removeItem('canvaid_canvas_api_key');
     localStorage.removeItem('canvaid_groq_api_key');
-    localStorage.removeItem('canvaid_institution_url');
+    // --- REMOVED: institutionUrl removal from localStorage ---
+    localStorage.removeItem('canvaid_institution_url'); // Also remove the old item
     set({ 
       apiKeys: { canvas: null, groq: null },
-      institutionUrl: null,
+      // --- REMOVED: institutionUrl from state reset ---
       user: null,
       courses: [],
       assignments: [],
