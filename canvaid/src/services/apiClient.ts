@@ -25,8 +25,9 @@ async function apiClient<T>(endpoint: string, options: RequestInit = {}): Promis
   // In production, your server-side proxy would read this header to know where to forward the request.
   headers.set('X-Canvas-Host', institutionUrl);
 
-  // All requests in development now go through our '/api-proxy' path.
-  const proxiedEndpoint = `/api-proxy${endpoint}`;
+  // THE FIX: Remove the leading '/' from the endpoint to prevent a double slash.
+  // This creates a clean path like '/api-proxy/api/v1/courses'.
+  const proxiedEndpoint = `/api-proxy${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
   const response = await fetch(proxiedEndpoint, {
     ...options,
