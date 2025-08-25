@@ -1,5 +1,5 @@
 // src/pages/SettingsPage.tsx
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import useCourseStore from '../store/courseStore';
