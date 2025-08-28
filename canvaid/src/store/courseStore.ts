@@ -1,4 +1,5 @@
-// src/store/courseStore.ts
+// canvaid/src/store/courseStore.ts
+
 import { create } from 'zustand';
 import { type CanvasCourse, type CanvasAssignment, type CanvasUser, type CanvasAnnouncement } from '../types/canvas';
 
@@ -35,8 +36,10 @@ const useCourseStore = create<CourseState>((set) => ({
   announcements: [],
   searchQuery: '',
   apiKeys: {
-    canvas: localStorage.getItem('canvaid_canvas_api_key'),
-    groq: localStorage.getItem('canvaid_groq_api_key'),
+    // START OF THE FIX: Add a check for the 'window' object
+    canvas: typeof window !== 'undefined' ? localStorage.getItem('canvaid_canvas_api_key') : null,
+    groq: typeof window !== 'undefined' ? localStorage.getItem('canvaid_groq_api_key') : null,
+    // END OF THE FIX
   },
   // --- REMOVED: institutionUrl initialization ---
   setUser: (user) => set({ user }),

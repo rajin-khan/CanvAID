@@ -1,3 +1,5 @@
+// canvaid/api/proxy.ts
+
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(
@@ -14,7 +16,7 @@ export default async function handler(
     });
   }
 
-  // 2. Safely handle the path, which could be a string or an array of strings.
+  // 2. Safely handle the path.
   const pathQuery = req.query.path;
   const canvasPathAndQuery = Array.isArray(pathQuery) ? pathQuery.join('/') : pathQuery;
 
@@ -29,23 +31,30 @@ export default async function handler(
   }
   
   const targetUrl = `${canvasHost}/${canvasPathAndQuery}`;
+  
+  // START OF THE FIX: Create fetch options object
+  const fetchOptions: RequestInit = {
+    method: req.method,
+    headers: {
+      'Authorization': authorization,
+    },
+  };
+  
+  // Conditionally add the body ONLY for non-GET requests
+  if (req.method !== 'GET' && req.method !== 'HEAD' && req.body) {
+    fetchOptions.body = req.body;
+  }
+  // END OF THE FIX
 
   try {
-    const canvasResponse = await fetch(targetUrl, {
-      method: req.method,
-      headers: {
-        'Authorization': authorization,
-      },
-      // Vercel automatically handles body parsing, so we pass it directly
-      body: req.body, 
-    });
+    // Pass the correctly configured options to fetch
+    const canvasResponse = await fetch(targetUrl, fetchOptions);
 
     // Forward the status from Canvas
     res.status(canvasResponse.status);
 
     // Forward the headers from Canvas
     canvasResponse.headers.forEach((value, key) => {
-      // Avoid headers that can cause issues with Vercel's response handling
       if (key.toLowerCase() !== 'content-encoding' && key.toLowerCase() !== 'transfer-encoding') {
         res.setHeader(key, value);
       }
