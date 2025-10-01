@@ -45,7 +45,7 @@ export const generateStudyGuide = async (courseName: string, courseContent: stri
         content: `Please generate a study guide for the course "${courseName}". Here are the course materials:\n\n${courseContent}`,
       },
     ],
-    model: "llama3-70b-8192", 
+    model: "llama-3.3-70b-versatile", 
   });
   return chatCompletion.choices[0]?.message?.content || "Sorry, I couldn't generate a study guide.";
 };
@@ -63,7 +63,7 @@ export const generateFlashcards = async (courseName: string, courseContent: stri
         content: `Extract the 10 most important key concepts and their definitions from the materials for the course "${courseName}". Here are the materials:\n\n${courseContent}`,
       },
     ],
-    model: "llama3-70b-8192",
+    model: "llama-3.3-70b-versatile",
     response_format: { type: "json_object" },
   });
     try {
@@ -99,7 +99,7 @@ export const generateActionPlan = async (announcementTitle: string, announcement
                 content: `Here is an announcement titled "${announcementTitle}". Please create an action plan for me based on its content:\n\n${announcementMessage}`,
             },
         ],
-        model: "llama3-70b-8192",
+        model: "llama-3.3-70b-versatile",
     });
     return chatCompletion.choices[0]?.message?.content || "Sorry, I couldn't generate an action plan for this announcement.";
 };
